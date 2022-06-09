@@ -28,4 +28,84 @@ object CIString {
     CaselessString(value)
 
   val empty: CIString = CaselessString.empty
+
+  def unapply(value: CIString): Some[String] =
+    Some(value.toString)
+}
+
+object SimpleCIString {
+
+  def apply(value: String): SimpleCIString =
+    CaselessString(value)
+
+  val empty: SimpleCIString = CaselessString.empty
+
+  def unapply(value: SimpleCIString): Some[String] =
+    Some(value.toString)
+}
+
+object TurkicCIString {
+
+  def apply(value: String): TurkicCIString =
+    CaselessString(value)
+
+  val empty: TurkicCIString = CaselessString.empty
+
+  def unapply(value: TurkicCIString): Some[String] =
+    Some(value.toString)
+}
+
+object TurkicSimpleCIString {
+
+  def apply(value: String): TurkicSimpleCIString =
+    CaselessString(value)
+
+  val empty: TurkicSimpleCIString = CaselessString.empty
+
+  def unapply(value: TurkicSimpleCIString): Some[String] =
+    Some(value.toString)
+}
+
+object CompatibilityCIString {
+
+  def apply(value: String): CompatibilityCIString =
+    CaselessString(value)
+
+  val empty: CompatibilityCIString = CaselessString.empty
+
+  def unapply(value: CompatibilityCIString): Some[String] =
+    Some(value.toString)
+}
+
+object CompatibilitySimpleCIString {
+
+  def apply(value: String): CompatibilitySimpleCIString =
+    CaselessString(value)
+
+  val empty: CompatibilitySimpleCIString = CaselessString.empty
+
+  def unapply(value: CompatibilitySimpleCIString): Some[String] =
+    Some(value.toString)
+}
+
+object CompatibilityTurkicCIString {
+
+  def apply(value: String): CompatibilityTurkicCIString =
+    CaselessString(value)
+
+  val empty: CompatibilityTurkicCIString = CaselessString.empty
+
+  def unapply(value: CompatibilityTurkicCIString): Some[String] =
+    Some(value.toString)
+}
+
+object CompatibilityTurkicSimpleCIString {
+
+  def apply(value: String): CompatibilityTurkicSimpleCIString =
+    CaselessString(value)
+
+  val empty: CompatibilityTurkicSimpleCIString = CaselessString.empty
+
+  def unapply(value: CompatibilityTurkicSimpleCIString): Some[String] =
+    Some(value.toString)
 }

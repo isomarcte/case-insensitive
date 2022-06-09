@@ -18,7 +18,8 @@ package org.typelevel
 
 package object ci {
 
-  /** A case insensitive representation of a `String`.
+  /** A case insensitive representation of a `String`, based on the canonical
+    * full cased folded representation of the given `String`.
     *
     * There are several different ways to define a case insensitive match with Unicode. According to
     * the Unicode standard, this is the "most correct" definition. If you are just looking for a case
@@ -35,7 +36,7 @@ package object ci {
     * scala> CanonicalFullCaseFoldedString("ß")
     * val res1: org.typelevel.ci.CanonicalFullCaseFoldedString = ss
     *
-    * scala> res0.asCanonicalFullCaseFoldedString == res1
+    * scala> res0.asCaseFoldedString == res1
     * val res2: Boolean = true
     *
     * scala> res0.toString
@@ -53,133 +54,141 @@ package object ci {
     */
   type CIString = CaselessString[CanonicalFullCaseFoldedString]
 
-  // final implicit class CIStringSyntax(sc: StringContext) {
+  type SimpleCIString = CaselessString[CanonicalSimpleCaseFoldedString]
 
-  //   /** Provides a `ci` interpolator, similar to the `s` interpolator. */
-  //   def ci(args: Any*): CIString = CIString(sc.s(args: _*))
+  type TurkicCIString = CaselessString[CanonicalTurkicFullCaseFoldedString]
 
-  //   object ci {
+  type TurkicSimpleCIString = CaselessString[CanonicalTurkicSimpleCaseFoldedString]
 
-  //     /** A globbing CIString matcher, similar to the `s` matcher. */
-  //     def unapplySeq(ci: CIString): Option[Seq[CIString]] = glob(sc.parts, ci)
-  //   }
-  // }
+  type CompatibilityCIString = CaselessString[CompatibilityFullCaseFoldedString]
 
-  // // Adapted from https://github.com/scala/scala/blob/v2.13.5/src/library/scala/StringContext.scala#L209
-  // // Originally inspired by https://research.swtch.com/glob
-  // private def glob(patternChunks: Seq[String], input: CIString): Option[Seq[CIString]] = {
-  //   var patternIndex = 0
-  //   var inputIndex = 0
-  //   var nextPatternIndex = 0
-  //   var nextInputIndex = 0
+  type CompatibilitySimpleCIString = CaselessString[CompatibilitySimpleCaseFoldedString]
 
-  //   val numWildcards = patternChunks.length - 1
-  //   val matchStarts = Array.fill(numWildcards)(-1)
-  //   val matchEnds = Array.fill(numWildcards)(-1)
+  type CompatibilityTurkicCIString = CaselessString[CompatibilityTurkicFullCaseFoldedString]
 
-  //   val nameLength = input.length
-  //   // The final pattern is as long as all the chunks, separated by 1-character
-  //   // glob-wildcard placeholders
-  //   val patternLength = {
-  //     var n = numWildcards
-  //     for (chunk <- patternChunks)
-  //       n += chunk.length
-  //     n
-  //   }
+  type CompatibilityTurkicSimpleCIString = CaselessString[CompatibilityTurkicSimpleCaseFoldedString]
 
-  //   // Convert the input pattern chunks into a single sequence of shorts; each
-  //   // non-negative short represents a character, while -1 represents a glob wildcard
-  //   val pattern = {
-  //     val arr = new Array[Short](patternLength)
-  //     var i = 0
-  //     var first = true
-  //     for (chunk <- patternChunks) {
-  //       if (first) first = false
-  //       else {
-  //         arr(i) = -1
-  //         i += 1
-  //       }
-  //       for (c <- chunk) {
-  //         arr(i) = c.toShort
-  //         i += 1
-  //       }
-  //     }
-  //     arr
-  //   }
+  final implicit class CIStringSyntax(sc: StringContext) {
 
-  //   // Lookup table for each character in the pattern to check whether or not
-  //   // it refers to a glob wildcard; a non-negative integer indicates which
-  //   // glob wildcard it represents, while -1 means it doesn't represent any
-  //   val matchIndices = {
-  //     val arr = Array.fill(patternLength + 1)(-1)
-  //     var i = 0
-  //     var j = 0
-  //     for (chunk <- patternChunks)
-  //       if (j < numWildcards) {
-  //         i += chunk.length
-  //         arr(i) = j
-  //         i += 1
-  //         j += 1
-  //       }
-  //     arr
-  //   }
+    /** Provides a `ci` interpolator, similar to the `s` interpolator. */
+    def ci(args: Any*): CIString = CIString(sc.s(args: _*))
 
-  //   while (patternIndex < patternLength || inputIndex < nameLength) {
-  //     matchIndices(patternIndex) match {
-  //       case -1 => // do nothing
-  //       case n =>
-  //         matchStarts(n) = matchStarts(n) match {
-  //           case -1 => inputIndex
-  //           case s => math.min(s, inputIndex)
-  //         }
-  //         matchEnds(n) = matchEnds(n) match {
-  //           case -1 => inputIndex
-  //           case s => math.max(s, inputIndex)
-  //         }
-  //     }
+    object ci {
 
-  //     val continue = if (patternIndex < patternLength) {
-  //       val c = pattern(patternIndex)
-  //       c match {
-  //         case -1 => // zero-or-more-character wildcard
-  //           // Try to match at nx. If that doesn't work out, restart at nx+1 next.
-  //           nextPatternIndex = patternIndex
-  //           nextInputIndex = inputIndex + 1
-  //           patternIndex += 1
-  //           true
-  //         case _ => // ordinary character
-  //           if (inputIndex < nameLength && eqCi(input.toString(inputIndex), c.toChar)) {
-  //             patternIndex += 1
-  //             inputIndex += 1
-  //             true
-  //           } else {
-  //             false
-  //           }
-  //       }
-  //     } else false
+      /** A globbing CIString matcher, similar to the `s` matcher. */
+      def unapplySeq(ci: CIString): Option[Seq[CIString]] = glob(sc.parts, ci)
+    }
+  }
 
-  //     // Mismatch. Maybe restart.
-  //     if (!continue) {
-  //       if (0 < nextInputIndex && nextInputIndex <= nameLength) {
-  //         patternIndex = nextPatternIndex
-  //         inputIndex = nextInputIndex
-  //       } else {
-  //         return None
-  //       }
-  //     }
-  //   }
+  // Adapted from https://github.com/scala/scala/blob/v2.13.5/src/library/scala/StringContext.scala#L209
+  // Originally inspired by https://research.swtch.com/glob
+  private def glob(patternChunks: Seq[String], input: CIString): Option[Seq[CIString]] = {
+    var patternIndex = 0
+    var inputIndex = 0
+    var nextPatternIndex = 0
+    var nextInputIndex = 0
 
-  //   // Matched all of pattern to all of name. Success.
-  //   Some(
-  //     compat.unsafeWrapArray(
-  //       Array.tabulate(patternChunks.length - 1)(n =>
-  //         CIString(input.toString.slice(matchStarts(n), matchEnds(n))))
-  //     ))
-  // }
+    val numWildcards = patternChunks.length - 1
+    val matchStarts = Array.fill(numWildcards)(-1)
+    val matchEnds = Array.fill(numWildcards)(-1)
 
-  // private def eqCi(a: Char, b: Char) = {
-  //   val a0 = a.toUpper
-  //   val b0 = b.toUpper
-  //   (a0 == b0) || (a0.toLower == b0.toLower)
-  // }
+    val nameLength = input.length
+    // The final pattern is as long as all the chunks, separated by 1-character
+    // glob-wildcard placeholders
+    val patternLength = {
+      var n = numWildcards
+      for (chunk <- patternChunks)
+        n += chunk.length
+      n
+    }
+
+    // Convert the input pattern chunks into a single sequence of shorts; each
+    // non-negative short represents a character, while -1 represents a glob wildcard
+    val pattern = {
+      val arr = new Array[Short](patternLength)
+      var i = 0
+      var first = true
+      for (chunk <- patternChunks) {
+        if (first) first = false
+        else {
+          arr(i) = -1
+          i += 1
+        }
+        for (c <- chunk) {
+          arr(i) = c.toShort
+          i += 1
+        }
+      }
+      arr
+    }
+
+    // Lookup table for each character in the pattern to check whether or not
+    // it refers to a glob wildcard; a non-negative integer indicates which
+    // glob wildcard it represents, while -1 means it doesn't represent any
+    val matchIndices = {
+      val arr = Array.fill(patternLength + 1)(-1)
+      var i = 0
+      var j = 0
+      for (chunk <- patternChunks)
+        if (j < numWildcards) {
+          i += chunk.length
+          arr(i) = j
+          i += 1
+          j += 1
+        }
+      arr
+    }
+
+    while (patternIndex < patternLength || inputIndex < nameLength) {
+      matchIndices(patternIndex) match {
+        case -1 => // do nothing
+        case n =>
+          matchStarts(n) = matchStarts(n) match {
+            case -1 => inputIndex
+            case s => math.min(s, inputIndex)
+          }
+          matchEnds(n) = matchEnds(n) match {
+            case -1 => inputIndex
+            case s => math.max(s, inputIndex)
+          }
+      }
+
+      val continue = if (patternIndex < patternLength) {
+        val c = pattern(patternIndex)
+        c match {
+          case -1 => // zero-or-more-character wildcard
+            // Try to match at nx. If that doesn't work out, restart at nx+1 next.
+            nextPatternIndex = patternIndex
+            nextInputIndex = inputIndex + 1
+            patternIndex += 1
+            true
+          case _ => // ordinary character
+            if (inputIndex < nameLength && eqCi(input.toString(inputIndex), c.toChar)) {
+              patternIndex += 1
+              inputIndex += 1
+              true
+            } else {
+              false
+            }
+        }
+      } else false
+
+      // Mismatch. Maybe restart.
+      if (!continue) {
+        if (0 < nextInputIndex && nextInputIndex <= nameLength) {
+          patternIndex = nextPatternIndex
+          inputIndex = nextInputIndex
+        } else {
+          return None
+        }
+      }
+    }
+
+    // Matched all of pattern to all of name. Success.
+    Some(
+      compat.unsafeWrapArray(
+        Array.tabulate(patternChunks.length - 1)(n =>
+          CIString(input.toString.slice(matchStarts(n), matchEnds(n))))
+      ))
+  }
 }

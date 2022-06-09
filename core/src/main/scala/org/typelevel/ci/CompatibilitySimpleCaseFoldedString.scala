@@ -16,6 +16,8 @@
 
 package org.typelevel.ci
 
+import cats._
+import cats.kernel.LowerBounded
 import java.text.Normalizer
 import scala.annotation.tailrec
 
@@ -48,4 +50,50 @@ object CompatibilitySimpleCaseFoldedString {
 
   val empty: CompatibilitySimpleCaseFoldedString =
     apply("")
+
+  implicit val hashAndOrderForCompatibilitySimpleCaseFoldedString
+      : Hash[CompatibilitySimpleCaseFoldedString] with Order[CompatibilitySimpleCaseFoldedString] =
+    new Hash[CompatibilitySimpleCaseFoldedString] with Order[CompatibilitySimpleCaseFoldedString] {
+      override def hash(x: CompatibilitySimpleCaseFoldedString): Int =
+        x.hashCode
+
+      override def compare(
+          x: CompatibilitySimpleCaseFoldedString,
+          y: CompatibilitySimpleCaseFoldedString): Int =
+        x.toString.compare(y.toString)
+    }
+
+  implicit val orderingForCompatibilitySimpleCaseFoldedString
+      : Ordering[CompatibilitySimpleCaseFoldedString] =
+    hashAndOrderForCompatibilitySimpleCaseFoldedString.toOrdering
+
+  implicit val showForCompatibilitySimpleCaseFoldedString: Show[CompatibilitySimpleCaseFoldedString] =
+    Show.fromToString
+
+  implicit val lowerBoundForCompatibilitySimpleCaseFoldedString
+      : LowerBounded[CompatibilitySimpleCaseFoldedString] =
+    new LowerBounded[CompatibilitySimpleCaseFoldedString] {
+      override val partialOrder: PartialOrder[CompatibilitySimpleCaseFoldedString] =
+        hashAndOrderForCompatibilitySimpleCaseFoldedString
+
+      override val minBound: CompatibilitySimpleCaseFoldedString =
+        empty
+    }
+
+  implicit val monoidForCompatibilitySimpleCaseFoldedString: Monoid[CompatibilitySimpleCaseFoldedString] =
+    new Monoid[CompatibilitySimpleCaseFoldedString] {
+      override val empty: CompatibilitySimpleCaseFoldedString = CompatibilitySimpleCaseFoldedString.empty
+
+      override def combine(
+          x: CompatibilitySimpleCaseFoldedString,
+          y: CompatibilitySimpleCaseFoldedString): CompatibilitySimpleCaseFoldedString =
+        CompatibilitySimpleCaseFoldedString(x.toString + y.toString)
+
+      override def combineAll(
+          xs: IterableOnce[CompatibilitySimpleCaseFoldedString]): CompatibilitySimpleCaseFoldedString = {
+        val sb: StringBuilder = new StringBuilder
+        xs.iterator.foreach(cfs => sb.append(cfs.toString))
+        CompatibilitySimpleCaseFoldedString(sb.toString)
+      }
+    }
 }

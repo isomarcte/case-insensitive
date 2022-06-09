@@ -8,6 +8,9 @@ trait CaseFoldedStringClass[A] extends Serializable {
 
   final def transform[B](a: A)(f: String => B): B =
     f(asString(a))
+
+  final def caseFoldString(value: String): String =
+    asString(fromString(value))
 }
 
 object CaseFoldedStringClass {

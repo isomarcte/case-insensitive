@@ -16,6 +16,8 @@
 
 package org.typelevel.ci
 
+import cats._
+import cats.kernel.LowerBounded
 import java.text.Normalizer
 import scala.annotation.tailrec
 
@@ -49,4 +51,53 @@ object CompatibilityTurkicFullCaseFoldedString {
 
   val empty: CompatibilityTurkicFullCaseFoldedString =
     apply("")
+
+  implicit val hashAndOrderForCompatibilityTurkicFullCaseFoldedString
+      : Hash[CompatibilityTurkicFullCaseFoldedString] with Order[CompatibilityTurkicFullCaseFoldedString] =
+    new Hash[CompatibilityTurkicFullCaseFoldedString] with Order[CompatibilityTurkicFullCaseFoldedString] {
+      override def hash(x: CompatibilityTurkicFullCaseFoldedString): Int =
+        x.hashCode
+
+      override def compare(
+          x: CompatibilityTurkicFullCaseFoldedString,
+          y: CompatibilityTurkicFullCaseFoldedString): Int =
+        x.toString.compare(y.toString)
+    }
+
+  implicit val orderingForCompatibilityTurkicFullCaseFoldedString
+      : Ordering[CompatibilityTurkicFullCaseFoldedString] =
+    hashAndOrderForCompatibilityTurkicFullCaseFoldedString.toOrdering
+
+  implicit val showForCompatibilityTurkicFullCaseFoldedString
+      : Show[CompatibilityTurkicFullCaseFoldedString] =
+    Show.fromToString
+
+  implicit val lowerBoundForCompatibilityTurkicFullCaseFoldedString
+      : LowerBounded[CompatibilityTurkicFullCaseFoldedString] =
+    new LowerBounded[CompatibilityTurkicFullCaseFoldedString] {
+      override val partialOrder: PartialOrder[CompatibilityTurkicFullCaseFoldedString] =
+        hashAndOrderForCompatibilityTurkicFullCaseFoldedString
+
+      override val minBound: CompatibilityTurkicFullCaseFoldedString =
+        empty
+    }
+
+  implicit val monoidForCompatibilityTurkicFullCaseFoldedString
+      : Monoid[CompatibilityTurkicFullCaseFoldedString] =
+    new Monoid[CompatibilityTurkicFullCaseFoldedString] {
+      override val empty: CompatibilityTurkicFullCaseFoldedString =
+        CompatibilityTurkicFullCaseFoldedString.empty
+
+      override def combine(
+          x: CompatibilityTurkicFullCaseFoldedString,
+          y: CompatibilityTurkicFullCaseFoldedString): CompatibilityTurkicFullCaseFoldedString =
+        CompatibilityTurkicFullCaseFoldedString(x.toString + y.toString)
+
+      override def combineAll(xs: IterableOnce[CompatibilityTurkicFullCaseFoldedString])
+          : CompatibilityTurkicFullCaseFoldedString = {
+        val sb: StringBuilder = new StringBuilder
+        xs.iterator.foreach(cfs => sb.append(cfs.toString))
+        CompatibilityTurkicFullCaseFoldedString(sb.toString)
+      }
+    }
 }

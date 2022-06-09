@@ -18,18 +18,42 @@ sealed abstract class CaselessString[A] extends Product with Serializable with O
 
   final def nonEmpty: Boolean = isEmpty == false
 
+  // methods for change the caseless variant
+
+  final def changeCaselessType[B: CaseFoldedStringClass: Order]: CaselessString[B] =
+    CaselessString[B](toString)
+
+  final def asCanonicalFullCaseless: CIString =
+    changeCaselessType
+
+  final def asCanonicalSimpleCaseless: SimpleCIString =
+    changeCaselessType
+
+  final def asTurkicCanonicalFullCaseless: TurkicCIString =
+    changeCaselessType
+
+  final def asTurkicCanonicalSimpleCaseless: TurkicSimpleCIString =
+    changeCaselessType
+
+  final def asCompatibilityFullCaseless: CompatibilityCIString =
+    changeCaselessType
+
+  final def asCompatibilitySimpleCaseless: CompatibilitySimpleCIString =
+    changeCaselessType
+
+  final def asTurkicCompatibilityFullCaseless: CompatibilityTurkicCIString =
+    changeCaselessType
+
+  final def asTurkicCompatibilitySimpleCaseless: CompatibilityTurkicSimpleCIString =
+    changeCaselessType
+
   override final def hashCode(): Int =
     asCaseFoldedString.hashCode()
 }
 
-private[ci] trait CaselessStringLowPriority0 {
-  implicit def partialOrderForCaselessString[A: PartialOrder: CaseFoldedStringClass]: PartialOrder[CaselessString[A]] =
-    PartialOrder.by(value => CaseFoldedStringClass[A].asString(value.asCaseFoldedString))
-}
+object CaselessString {
 
-object CaselessString extends CaselessStringLowPriority0 {
-
-  private[this] final case class CaselessStringImpl[A: CaseFoldedStringClass](override val toString: String) extends CaselessString[A] {
+  private[this] final case class CaselessStringImpl[A: CaseFoldedStringClass: Order](override val toString: String) extends CaselessString[A] {
     override lazy val asCaseFoldedString: A =
       CaseFoldedStringClass[A].fromString(toString)
 
@@ -43,13 +67,13 @@ object CaselessString extends CaselessStringLowPriority0 {
       CaseFoldedStringClass[A].asString(asCaseFoldedString).length
 
     override def compare(that: CaselessString[A]): Int =
-      this.compare(that)
+      Order[CaselessString[A]].compare(this, that)
   }
 
-  def apply[A: CaseFoldedStringClass](value: String): CaselessString[A] =
+  def apply[A: CaseFoldedStringClass: Order](value: String): CaselessString[A] =
     CaselessStringImpl(value)
 
-  def empty[A: CaseFoldedStringClass]: CaselessString[A] =
+  def empty[A: CaseFoldedStringClass: Order]: CaselessString[A] =
     CaselessString[A]("")
 
   implicit def hashAndOrderForCaselessString[A: Order]: Hash[CaselessString[A]] with Order[CaselessString[A]] =
@@ -64,7 +88,7 @@ object CaselessString extends CaselessStringLowPriority0 {
   implicit def showForCaselessString[A]: Show[CaselessString[A]] =
     Show.fromToString
 
-  implicit def monoidForCaselessString[A: CaseFoldedStringClass]: Monoid[CaselessString[A]] =
+  implicit def monoidForCaselessString[A: CaseFoldedStringClass: Order]: Monoid[CaselessString[A]] =
     new Monoid[CaselessString[A]] {
       override val empty: CaselessString[A] = CaselessString.empty
 
@@ -80,10 +104,10 @@ object CaselessString extends CaselessStringLowPriority0 {
       }
     }
 
-  implicit def lowerBoundInstanceForCaselessString[A: CaseFoldedStringClass: PartialOrder]: LowerBounded[CaselessString[A]] =
+  implicit def lowerBoundInstanceForCaselessString[A: CaseFoldedStringClass: Order]: LowerBounded[CaselessString[A]] =
     new LowerBounded[CaselessString[A]] {
       override def partialOrder: PartialOrder[CaselessString[A]] =
-        PartialOrder[CaselessString[A]]
+        Order[CaselessString[A]]
 
       override val minBound: CaselessString[A] =
         CaselessString.empty
