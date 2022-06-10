@@ -82,23 +82,24 @@ package object ci {
 
   // Adapted from https://github.com/scala/scala/blob/v2.13.5/src/library/scala/StringContext.scala#L209
   // Originally inspired by https://research.swtch.com/glob
-  private def glob(patternChunks: Seq[String], input: CIString): Option[Seq[CIString]] = {
+  private def glob(patternChunksRaw: Seq[String], input: CIString): Option[Seq[CIString]] = {
     var patternIndex = 0
     var inputIndex = 0
     var nextPatternIndex = 0
     var nextInputIndex = 0
 
+    val patternChunks: Seq[CIString] = patternChunksRaw.map(CIString.apply)
     val numWildcards = patternChunks.length - 1
     val matchStarts = Array.fill(numWildcards)(-1)
     val matchEnds = Array.fill(numWildcards)(-1)
 
-    val nameLength = input.length
+    val nameLength = input.caselessCharLength
     // The final pattern is as long as all the chunks, separated by 1-character
     // glob-wildcard placeholders
     val patternLength = {
       var n = numWildcards
       for (chunk <- patternChunks)
-        n += chunk.length
+        n += chunk.caselessCharLength
       n
     }
 
@@ -114,7 +115,7 @@ package object ci {
           arr(i) = -1
           i += 1
         }
-        for (c <- chunk) {
+        for (c <- chunk.asCaseFoldedString.toString) {
           arr(i) = c.toShort
           i += 1
         }
@@ -131,7 +132,7 @@ package object ci {
       var j = 0
       for (chunk <- patternChunks)
         if (j < numWildcards) {
-          i += chunk.length
+          i += chunk.caselessCharLength
           arr(i) = j
           i += 1
           j += 1
