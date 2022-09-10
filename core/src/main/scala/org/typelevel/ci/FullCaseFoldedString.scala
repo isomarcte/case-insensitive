@@ -31,4 +31,49 @@ object FullCaseFoldedString {
 
   val empty: FullCaseFoldedString =
     apply("")
+
+  implicit val hashAndOrderForFullCaseFoldedString
+      : Hash[FullCaseFoldedString] with Order[FullCaseFoldedString] =
+    new Hash[FullCaseFoldedString] with Order[FullCaseFoldedString] {
+      override def hash(x: FullCaseFoldedString): Int =
+        x.hashCode
+
+      override def compare(
+          x: FullCaseFoldedString,
+          y: FullCaseFoldedString): Int =
+        x.toString.compare(y.toString)
+    }
+
+  implicit val orderingForFullCaseFoldedString: Ordering[FullCaseFoldedString] =
+    hashAndOrderForFullCaseFoldedString.toOrdering
+
+  implicit val showForFullCaseFoldedString: Show[FullCaseFoldedString] =
+    Show.fromToString
+
+  implicit val lowerBoundForFullCaseFoldedString
+      : LowerBounded[FullCaseFoldedString] =
+    new LowerBounded[FullCaseFoldedString] {
+      override val partialOrder: PartialOrder[FullCaseFoldedString] =
+        hashAndOrderForFullCaseFoldedString
+
+      override val minBound: FullCaseFoldedString =
+        empty
+    }
+
+  implicit val monoidForFullCaseFoldedString: Monoid[FullCaseFoldedString] =
+    new Monoid[FullCaseFoldedString] {
+      override val empty: FullCaseFoldedString = FullCaseFoldedString.empty
+
+      override def combine(
+          x: FullCaseFoldedString,
+          y: FullCaseFoldedString): FullCaseFoldedString =
+        FullCaseFoldedString(x.toString + y.toString)
+
+      override def combineAll(
+          xs: IterableOnce[FullCaseFoldedString]): FullCaseFoldedString = {
+        val sb: StringBuilder = new StringBuilder
+        xs.iterator.foreach(cfs => sb.append(cfs.toString))
+        FullCaseFoldedString(sb.toString)
+      }
+    }
 }

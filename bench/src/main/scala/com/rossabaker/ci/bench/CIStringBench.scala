@@ -27,21 +27,21 @@ class CIStringBench {
   def hash: Int = ci.hashCode
 
   @Benchmark
-  def combineAll: CIString = Monoid[CIString].combineAll(ciList)
+  def combineAll: CanonicalFullCIString = Monoid[CanonicalFullCIString].combineAll(ciList)
 }
 
 object CIStringBench {
-  val ci = CIString("A Case-Insensitive String")
+  val ci = CanonicalFullCIString("A Case-Insensitive String")
 
   val ciList = List(
-    CIString("A"),
-    CIString("B"),
-    CIString("C"),
-    CIString("D"),
-    CIString("E"),
-    CIString("F"),
-    CIString("G"),
-    CIString("H"),
-    CIString("I")
+    CanonicalFullCIString("A"),
+    CanonicalFullCIString("B"),
+    CanonicalFullCIString("C"),
+    CanonicalFullCIString("D"),
+    CanonicalFullCIString("E"),
+    CanonicalFullCIString("F"),
+    CanonicalFullCIString("G"),
+    CanonicalFullCIString("H"),
+    CanonicalFullCIString("I")
   )
 }

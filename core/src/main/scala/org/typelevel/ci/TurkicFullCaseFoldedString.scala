@@ -16,6 +16,8 @@
 
 package org.typelevel.ci
 
+import cats._
+import cats.kernel._
 import scala.annotation.tailrec
 
 final case class TurkicFullCaseFoldedString private (override val toString: String) extends AnyVal
@@ -26,4 +28,49 @@ object TurkicFullCaseFoldedString {
 
   val empty: TurkicFullCaseFoldedString =
     apply("")
+
+  implicit val hashAndOrderForTurkicFullCaseFoldedString
+      : Hash[TurkicFullCaseFoldedString] with Order[TurkicFullCaseFoldedString] =
+    new Hash[TurkicFullCaseFoldedString] with Order[TurkicFullCaseFoldedString] {
+      override def hash(x: TurkicFullCaseFoldedString): Int =
+        x.hashCode
+
+      override def compare(
+          x: TurkicFullCaseFoldedString,
+          y: TurkicFullCaseFoldedString): Int =
+        x.toString.compare(y.toString)
+    }
+
+  implicit val orderingForTurkicFullCaseFoldedString: Ordering[TurkicFullCaseFoldedString] =
+    hashAndOrderForTurkicFullCaseFoldedString.toOrdering
+
+  implicit val showForTurkicFullCaseFoldedString: Show[TurkicFullCaseFoldedString] =
+    Show.fromToString
+
+  implicit val lowerBoundForTurkicFullCaseFoldedString
+      : LowerBounded[TurkicFullCaseFoldedString] =
+    new LowerBounded[TurkicFullCaseFoldedString] {
+      override val partialOrder: PartialOrder[TurkicFullCaseFoldedString] =
+        hashAndOrderForTurkicFullCaseFoldedString
+
+      override val minBound: TurkicFullCaseFoldedString =
+        empty
+    }
+
+  implicit val monoidForTurkicFullCaseFoldedString: Monoid[TurkicFullCaseFoldedString] =
+    new Monoid[TurkicFullCaseFoldedString] {
+      override val empty: TurkicFullCaseFoldedString = TurkicFullCaseFoldedString.empty
+
+      override def combine(
+          x: TurkicFullCaseFoldedString,
+          y: TurkicFullCaseFoldedString): TurkicFullCaseFoldedString =
+        TurkicFullCaseFoldedString(x.toString + y.toString)
+
+      override def combineAll(
+          xs: IterableOnce[TurkicFullCaseFoldedString]): TurkicFullCaseFoldedString = {
+        val sb: StringBuilder = new StringBuilder
+        xs.iterator.foreach(cfs => sb.append(cfs.toString))
+        TurkicFullCaseFoldedString(sb.toString)
+      }
+    }
 }

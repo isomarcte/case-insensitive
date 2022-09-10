@@ -23,29 +23,52 @@ sealed abstract class CaselessString[A] extends Product with Serializable with O
   final def changeCaselessType[B: CaseFoldedStringClass: Order]: CaselessString[B] =
     CaselessString[B](toString)
 
-  final def asCanonicalFullCaseless: CIString =
+  final def asCIString: CIString =
+    asCanonicalFullCaseless
+
+  final def asCanonicalFullCaseless: CanonicalFullCIString =
     changeCaselessType
 
   final def asCanonicalSimpleCaseless: SimpleCIString =
     changeCaselessType
 
-  final def asTurkicCanonicalFullCaseless: TurkicCIString =
+  final def asTurkicCanonicalFullCaseless: TurkicFullCIString =
     changeCaselessType
 
   final def asTurkicCanonicalSimpleCaseless: TurkicSimpleCIString =
     changeCaselessType
 
-  final def asCompatibilityFullCaseless: CompatibilityCIString =
+  final def asCompatibilityFullCaseless: CompatibilityFullCIString =
     changeCaselessType
 
   final def asCompatibilitySimpleCaseless: CompatibilitySimpleCIString =
     changeCaselessType
 
-  final def asTurkicCompatibilityFullCaseless: CompatibilityTurkicCIString =
+  final def asTurkicCompatibilityFullCaseless: CompatibilityTurkicFullCIString =
     changeCaselessType
 
   final def asTurkicCompatibilitySimpleCaseless: CompatibilityTurkicSimpleCIString =
     changeCaselessType
+
+  final def asFullCaseless: FullCIString =
+    changeCaselessType
+
+  final def asSimpleCaseless: SimpleCIString =
+    changeCaselessType
+
+  final def asTurkicFullCaseless: TurkicFullCIString =
+    changeCaselessType
+
+  final def asTurkicSimpleCaseless: TurkicSimpleCIString =
+    changeCaselessType
+
+  override final def equals(that: Any): Boolean =
+    that match {
+      case that: CaselessString[_] =>
+        asCaseFoldedString == that.asCaseFoldedString
+      case _ =>
+        false
+    }
 
   override final def hashCode(): Int =
     asCaseFoldedString.hashCode()

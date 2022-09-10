@@ -16,6 +16,8 @@
 
 package org.typelevel.ci
 
+import cats._
+import cats.kernel._
 import scala.annotation.tailrec
 
 final case class TurkicSimpleCaseFoldedString private (override val toString: String) extends AnyVal
@@ -26,4 +28,49 @@ object TurkicSimpleCaseFoldedString {
 
   val empty: TurkicSimpleCaseFoldedString =
     apply("")
+
+  implicit val hashAndOrderForTurkicSimpleCaseFoldedString
+      : Hash[TurkicSimpleCaseFoldedString] with Order[TurkicSimpleCaseFoldedString] =
+    new Hash[TurkicSimpleCaseFoldedString] with Order[TurkicSimpleCaseFoldedString] {
+      override def hash(x: TurkicSimpleCaseFoldedString): Int =
+        x.hashCode
+
+      override def compare(
+          x: TurkicSimpleCaseFoldedString,
+          y: TurkicSimpleCaseFoldedString): Int =
+        x.toString.compare(y.toString)
+    }
+
+  implicit val orderingForTurkicSimpleCaseFoldedString: Ordering[TurkicSimpleCaseFoldedString] =
+    hashAndOrderForTurkicSimpleCaseFoldedString.toOrdering
+
+  implicit val showForTurkicSimpleCaseFoldedString: Show[TurkicSimpleCaseFoldedString] =
+    Show.fromToString
+
+  implicit val lowerBoundForTurkicSimpleCaseFoldedString
+      : LowerBounded[TurkicSimpleCaseFoldedString] =
+    new LowerBounded[TurkicSimpleCaseFoldedString] {
+      override val partialOrder: PartialOrder[TurkicSimpleCaseFoldedString] =
+        hashAndOrderForTurkicSimpleCaseFoldedString
+
+      override val minBound: TurkicSimpleCaseFoldedString =
+        empty
+    }
+
+  implicit val monoidForTurkicSimpleCaseFoldedString: Monoid[TurkicSimpleCaseFoldedString] =
+    new Monoid[TurkicSimpleCaseFoldedString] {
+      override val empty: TurkicSimpleCaseFoldedString = TurkicSimpleCaseFoldedString.empty
+
+      override def combine(
+          x: TurkicSimpleCaseFoldedString,
+          y: TurkicSimpleCaseFoldedString): TurkicSimpleCaseFoldedString =
+        TurkicSimpleCaseFoldedString(x.toString + y.toString)
+
+      override def combineAll(
+          xs: IterableOnce[TurkicSimpleCaseFoldedString]): TurkicSimpleCaseFoldedString = {
+        val sb: StringBuilder = new StringBuilder
+        xs.iterator.foreach(cfs => sb.append(cfs.toString))
+        TurkicSimpleCaseFoldedString(sb.toString)
+      }
+    }
 }

@@ -88,4 +88,40 @@ object CaseFoldedStringClass {
       override def asString(a: CompatibilityTurkicSimpleCaseFoldedString): String =
         a.toString
     }
+
+  implicit val fullCaseFoldedStringInstance: CaseFoldedStringClass[FullCaseFoldedString] =
+    new CaseFoldedStringClass[FullCaseFoldedString] {
+      override def fromString(value: String): FullCaseFoldedString =
+        FullCaseFoldedString(value)
+
+      override def asString(a: FullCaseFoldedString): String =
+        a.toString
+    }
+
+  implicit val simpleCaseFoldedStringInstance: CaseFoldedStringClass[SimpleCaseFoldedString] =
+    new CaseFoldedStringClass[SimpleCaseFoldedString] {
+      override def fromString(value: String): SimpleCaseFoldedString =
+        SimpleCaseFoldedString(value)
+
+      override def asString(a: SimpleCaseFoldedString): String =
+        a.toString
+    }
+
+  implicit val turkicFullCaseFoldedStringInstance: CaseFoldedStringClass[TurkicFullCaseFoldedString] =
+    new CaseFoldedStringClass[TurkicFullCaseFoldedString] {
+      override def fromString(value: String): TurkicFullCaseFoldedString =
+        TurkicFullCaseFoldedString(value)
+
+      override def asString(a: TurkicFullCaseFoldedString): String =
+        a.toString
+    }
+
+  implicit val turkicSimpleCaseFoldedStringInstance: CaseFoldedStringClass[TurkicSimpleCaseFoldedString] =
+    new CaseFoldedStringClass[TurkicSimpleCaseFoldedString] {
+      override def fromString(value: String): TurkicSimpleCaseFoldedString =
+        TurkicSimpleCaseFoldedString(value)
+
+      override def asString(a: TurkicSimpleCaseFoldedString): String =
+        a.toString
+    }
 }

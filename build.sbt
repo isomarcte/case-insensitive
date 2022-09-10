@@ -38,6 +38,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "case-insensitive",
     libraryDependencies ++= Seq(
+      "io.github.cquiroz" %%% "scala-java-locales" % "1.4.1",
       "org.typelevel" %%% "cats-core" % catsV
     ),
     console / initialCommands := {
@@ -155,7 +156,7 @@ val Scala213Cond = s"matrix.scala == '$Scala213'"
 inThisBuild(
   List(
     tlBaseVersion := "1.2",
-    crossScalaVersions := Seq("2.12.15", Scala213, "3.0.2"),
+    crossScalaVersions := Seq("2.12.15", Scala213, "3.1.3"),
     homepage := Some(url("https://typelevel.org/case-insensitive")),
     tlSiteApiUrl := Some(url(
       "https://www.javadoc.io/doc/org.typelevel/case-insensitive_2.13/latest/org/typelevel/ci/index.html")),
